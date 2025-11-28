@@ -1,0 +1,40 @@
+[package]
+name = "pappap-ai-chain"
+version = "0.3.0"
+edition = "2021"
+
+[dependencies]
+# Web Server & Async
+actix-web = "4"
+actix-cors = "0.6"
+actix-files = "0.6"
+tokio = { version = "1", features = ["full"] }
+futures = "0.3"
+pqcrypto-dilithium = "0.5" # <-- THÊM MỚI
+pqcrypto-traits = "0.3.5"  # <-- THÊM MỚI
+
+# System & Hardware
+sysinfo = "0.29"
+
+# Database & Storage
+sled = "0.34"
+bincode = "1.3"
+
+# Utilities for Compute & Crypto
+uuid = { version = "1.4", features = ["v4", "fast-rng", "macro-diagnostics"] }
+md5 = "0.7"
+chrono = "0.4"
+sha2 = "0.10"
+hex = "0.4"
+rand = "0.8"
+
+# Logging
+env_logger = "0.10"
+log = "0.4"
+
+# Networking (P2P)
+libp2p = { version = "0.53", features = ["tcp", "noise", "yamux", "gossipsub", "identify", "macros", "tokio"] }
+
+# Serialization
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"

@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>PAPPAP AI NEURAL LINK</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root { --bg: #050505; --panel: #0f1115; --text: #a0a0a0; --neon: #00f2ff; --green: #00ff9d; }
+        body { background: var(--bg); color: var(--text); font-family: 'Courier New', monospace; margin: 0; padding: 20px; overflow-x: hidden; }
+        .container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+        
+        .card { background: var(--panel); border: 1px solid #222; padding: 20px; border-radius: 4px; box-shadow: 0 0 20px rgba(0, 242, 255, 0.05); }
+        h2 { color: var(--neon); margin-top: 0; text-transform: uppercase; font-size: 1em; letter-spacing: 2px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+        
+        /* Chart Container */
+        .chart-box { height: 250px; width: 100%; }
+
+        /* Block List */
+        .block-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #222; font-size: 0.85em; }
+        .block-row:first-child { color: var(--green); font-weight: bold; animation: flash 1s; }
+        @keyframes flash { 0% { background: #003300; } 100% { background: transparent; } }
+
+        /* Chat */
+        #chat-history { height: 300px; overflow-y: auto; background: #000; padding: 10px; border: 1px solid #333; margin-bottom: 10px; }
+        .msg { margin-bottom: 8px; }
+        .msg.user { color: #fff; text-align: right; }
+        .msg.ai { color: var(--neon); }
+        input { width: 70%; padding: 10px; background: #111; border: 1px solid var(--neon); color: white; }
+        button { width: 25%; padding: 10px; background: var(--neon); color: black; border: none; font-weight: bold; cursor: pointer; }
+
+        .stat-value { font-size: 2.5em; color: white; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div style="text-align: center; margin-bottom: 20px;">
+        <h1 style="color: var(--neon); text-shadow: 0 0 10px var(--neon);">PAPPAP AI NEURAL LINK</h1>
+        <small>GENESIS NODE | <span style="color: var(--green)">? SYSTEM ONLINE</span></small>
+    </div>
+
+    <div class="container">
+        <div>
+            <div class="card">
+                <h2>?? Neural Activity (Spike Rate)</h2>
+                <div class="chart-box">
+                    <canvas id="spikeChart"></canvas>
+                </div>
+            </div>
+            
+            <br>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <div class="card">
+                    <h2>Block Height</h2>
+                    <div class="stat-value" id="height">0</div>
+                </div>
+                <div class="card">
+                    <h2>Brain Power</h2>
+                    <div class="stat-value" id="power">0</div>
+                </div>
+            </div>
+
+            <br>
+            
+            <div class="card">
+                <h2>?? Blockchain Stream</h2>
+                <div id="blocks">Loading...</div>
+            </div>
+        </div>
+
+        <div>
+            <div class="card">
+                <h2>?? Neural Interface</h2>
+                <div id="chat-history">
+                    <div class="msg ai">PAPPAP: H? th?ng da s?n sang. Hay giao ti?p v?i toi.</div>
+                </div>
+                <div style="display: flex; justify-content: space-between;">
+                    <input type="text" id="prompt" placeholder="Message or /teach question | answer" onkeypress="handleEnter(event)">
+                    <button onclick="send()">SEND</button>
+                </div>
+                <p style="font-size: 0.8em; color: #666; margin-top: 5px;">
+                    Tip: D? d?y AI, dung cu phap: <br><code>/teach Xin chao | Chao b?n!</code>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- CHART CONFIG ---
+        const ctx = document.getElementById('spikeChart').getContext('2d');
+        const spikeChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: Array(50).fill(''),
+                datasets: [{
+                    label: 'Spike Intensity',
+                    data: Array(50).fill(1),
+                    borderColor: '#00f2ff',
+                    borderWidth: 2,
+                    tension: 0.4,
+                    pointRadius: 0,
+                    fill: true,
+                    backgroundColor: 'rgba(0, 242, 255, 0.1)'
+                }]
+            },
+            options: {
+                animation: false,
+                scales: { 
+                    y: { display: false, min: 0.9, max: 2.5 },
+                    x: { display: false }
+                },
+                plugins: { legend: { display: false } }
+            }
+        });
+
+        // --- CORE LOGIC ---
+        const API = '/api';
+
+        async function loop() {
+            try {
+                // 1. Get Stats & Blocks
+                const [healthRes, blocksRes] = await Promise.all([
+                    fetch(`${API}/health`),
+                    fetch(`${API}/blocks`)
+                ]);
+                const health = await healthRes.json();
+                const blocks = await blocksRes.json();
+
+                // Update DOM
+                document.getElementById('height').innerText = health.height;
+                document.getElementById('power').innerText = health.power.toFixed(1);
+
+                // Update Chart (Simulate Heartbeat)
+                // L?y spike t? block m?i nh?t d? v?
+                const latestSpike = blocks[0]?.spike_score || 1.0;
+                const data = spikeChart.data.datasets[0].data;
+                data.shift();
+                data.push(latestSpike);
+                spikeChart.update();
+
+                // Update Blocks List
+                const html = blocks.map(b => `
+                    <div class="block-row">
+                        <span>#${b.index} <span style="color:#666">${b.hash.substring(0,8)}...</span></span>
+                        <span style="color: ${b.spike_score > 1.5 ? '#ff0055' : '#00ff9d'}">
+                            ? ${b.spike_score.toFixed(4)}
+                        </span>
+                    </div>
+                `).join('');
+                document.getElementById('blocks').innerHTML = html;
+
+            } catch(e) {}
+            setTimeout(loop, 800); // 800ms refresh rate
+        }
+
+        // --- CHAT LOGIC ---
+        async function send() {
+            const input = document.getElementById('prompt');
+            const val = input.value.trim();
+            if(!val) return;
+
+            addMsg('user', val);
+            input.value = '';
+
+            // Check if teaching command
+            if (val.startsWith('/teach ')) {
+                const parts = val.replace('/teach ', '').split('|');
+                if (parts.length === 2) {
+                    await fetch(`${API}/teach`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({ keyword: parts[0].trim(), answer: parts[1].trim() })
+                    });
+                    addMsg('ai', `? Da h?c: "${parts[0].trim()}"`);
+                    return;
+                }
+            }
+
+            // Normal chat
+            const res = await fetch(`${API}/prompt`, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ prompt: val })
+            });
+            const data = await res.json();
+            
+            let moodIcon = '??';
+            if (data.mood.includes('Excited')) moodIcon = '??';
+            if (data.mood.includes('Calm')) moodIcon = '??';
+            
+            addMsg('ai', `${moodIcon} [${data.mood}] ${data.ai_response}`);
+        }
+
+        function addMsg(role, text) {
+            const box = document.getElementById('chat-history');
+            const div = document.createElement('div');
+            div.className = `msg ${role}`;
+            div.innerText = (role === 'ai' ? 'AI: ' : 'YOU: ') + text;
+            box.appendChild(div);
+            box.scrollTop = box.scrollHeight;
+        }
+
+        function handleEnter(e) { if(e.key === 'Enter') send(); }
+
+        // Start
+        loop();
+    </script>
+</body>
+</html>

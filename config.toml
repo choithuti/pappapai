@@ -1,0 +1,13 @@
+# config.toml
+[server]
+listen_addr = "0.0.0.0:8081"
+node_name = "Pappap-Node"
+
+[network]
+p2p_port = 9001
+topic = "pappap-mainnet-v1"
+
+[security]
+# Key mã hóa 32 bytes (Base64 hoặc Hex string trong thực tế). 
+# Đây là ví dụ, Production nên dùng biến môi trường.
+encryption_key = "pappap_secret_key_must_be_32_bytes!!"
