@@ -1,0 +1,14 @@
+● pappap.service - PAPPAP AI CHAIN SNN Genesis Node – Made in Vietnam
+     Loaded: loaded (]8;;file://srv1151199/etc/systemd/system/pappap.service\/etc/systemd/system/pappap.service]8;;\; [0;1;32menabled[0m; preset: [0;1;32menabled[0m)
+    Drop-In: /etc/systemd/system/pappap.service.d
+             └─]8;;file://srv1151199/etc/systemd/system/pappap.service.d/override.conf\override.conf]8;;\
+     Active: activating (auto-restart) (Result: exit-code) since Fri 2025-11-28 12:34:58 UTC; 560ms ago
+ Invocation: d4c4b00aff574551a6de4396e8c21344
+    Process: 6977 ExecStart=/root/.cargo/bin/cargo run --release [0;1;31m(code=exited, status=200/CHDIR)[0m
+   Main PID: 6977 (code=exited, status=200/CHDIR)
+   Mem peak: 1.5M
+        CPU: 4ms
+
+Nov 28 12:34:59 srv1151199 systemd[1]: [0;1;38:5:185m[0;1;39m[0;1;38:5:185m]8;;file://srv1151199/etc/systemd/system/pappap.service.d/override.conf\/etc/systemd/system/pappap.service.d/override.conf]8;;\:1: Assignment outside of section. Ignoring.[0m
+Nov 28 12:34:59 srv1151199 systemd[1]: [0;1;38:5:185m[0;1;39m[0;1;38:5:185m]8;;file://srv1151199/etc/systemd/system/pappap.service.d/override.conf\/etc/systemd/system/pappap.service.d/override.conf]8;;\:2: Assignment outside of section. Ignoring.[0m
+Nov 28 12:34:59 srv1151199 systemd[1]: [0;1;38:5:185m[0;1;39m[0;1;38:5:185m]8;;file://srv1151199/etc/systemd/system/pappap.service.d/override.conf\/etc/systemd/system/pappap.service.d/override.conf]8;;\:3: Assignment outside of section. Ignoring.[0m

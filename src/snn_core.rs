@@ -1,107 +1,102 @@
 use tokio::sync::RwLock;
 use rand::{Rng, SeedableRng, rngs::StdRng};
-use std::hash::{Hash, Hasher};
 use std::collections::hash_map::DefaultHasher;
+use std::hash::{Hash, Hasher};
 use sysinfo::{System, SystemExt};
 use std::sync::Arc;
-use crate::storage::Storage; // Import Storage
+use crate::storage::Storage;
+use crate::oracle::Oracle;
+use crate::llm::LLMBridge;
+// Đã xóa 'use regex::Regex' ở đây
 
 #[derive(Clone, Debug)]
 pub struct BioNeuron {
-    pub potential: f32,
-    pub threshold: f32,
-    pub decay: f32,
-    pub refractory_timer: u8,
+    pub potential: f32, pub threshold: f32, pub decay: f32,
+    pub refractory_timer: u8, pub sensitivity: f32, 
 }
 
 pub struct SNNCore {
     neurons: RwLock<Vec<BioNeuron>>,
-    weights: Vec<f32>,
-    storage: Arc<Storage>, // Thay HashMap bằng Storage
+    storage: Arc<Storage>,
+    oracle: Oracle,
+    llm: LLMBridge,
     total_neurons: usize,
 }
 
 impl SNNCore {
     pub fn new(storage: Arc<Storage>) -> Self {
-        // Auto-scale logic (giữ nguyên)
         let mut sys = System::new_all();
         sys.refresh_all();
-        let total_memory_kb = sys.total_memory();
-        let scale_factor = 5_000; // Giảm nhẹ để dành RAM cho DB
-        let ram_gb = total_memory_kb / (1024 * 1024);
-        let neuron_count = (ram_gb as usize * scale_factor).max(1024);
-
-        println!("🧠 BIO-SNN LOADED | Neurons: {} | Storage: PERSISTENT", neuron_count);
+        let ram_gb = sys.total_memory() / (1024 * 1024);
+        let neuron_count = ((ram_gb as usize * 50_000).max(10_000)).min(1_000_000);
+        println!("🧠 PẬP PẬP INTELLIGENCE ONLINE | Neurons: {}", neuron_count);
 
         let mut rng = rand::thread_rng();
         let mut neurons = Vec::with_capacity(neuron_count);
-        let mut weights = Vec::with_capacity(neuron_count);
-
         for _ in 0..neuron_count {
-            neurons.push(BioNeuron {
-                potential: -70.0,
-                threshold: -55.0 + rng.gen_range(-5.0..5.0),
-                decay: 0.95,
-                refractory_timer: 0,
-            });
-            weights.push(rng.gen_range(0.1..0.5));
+            neurons.push(BioNeuron { potential: -70.0, threshold: -55.0, decay: 0.95, refractory_timer: 0, sensitivity: 1.0 });
         }
 
         Self {
             neurons: RwLock::new(neurons),
-            weights,
             storage,
+            oracle: Oracle::new(),
+            llm: LLMBridge::new(),
             total_neurons: neuron_count,
         }
     }
 
-    // Mining Forward (Giữ nguyên logic cũ)
-    pub async fn forward(&self, _input: f32) -> f32 {
+    pub async fn train_step(&self, intensity: f32) -> f32 {
         let mut neurons = self.neurons.write().await;
-        let mut active_count = 0.0;
-        let mut rng = rand::thread_rng();
         let sample = 1024.min(self.total_neurons);
+        let mut active = 0.0;
+        let mut rng = rand::thread_rng(); // FIX: Khai báo rng ở đây để dùng trong vòng lặp
 
         for i in 0..sample {
             let n = &mut neurons[i];
-            if n.refractory_timer > 0 { n.refractory_timer -= 1; continue; }
-            n.potential += rng.gen_range(2.0..10.0);
-            if n.potential >= n.threshold {
-                n.potential = -85.0;
-                n.refractory_timer = 5;
-                active_count += 1.0;
-            } else {
-                n.potential *= n.decay;
+            n.potential += intensity * n.sensitivity + rng.gen_range(0.0..1.0); // Thêm nhiễu ngẫu nhiên
+            if n.potential >= n.threshold { n.potential = -85.0; active += 1.0; n.sensitivity = (n.sensitivity + 0.01).min(3.0); }
+            else { n.potential *= n.decay; }
+        }
+        active / sample as f32
+    }
+
+    pub async fn forward(&self, _input: f32) -> f32 { self.train_step(1.0).await }
+    pub async fn stats(&self) -> (usize, f32) { (self.total_neurons, 1024.0) }
+    pub async fn learn(&self, k: String, v: String) { self.storage.learn_fact(&k, &v); }
+
+    pub async fn process_text(&self, text: &str) -> (f32, String, String) {
+        let mut hasher = DefaultHasher::new(); text.hash(&mut hasher);
+        let mut rng = StdRng::seed_from_u64(hasher.finish());
+        let score = 1.0 + rng.gen_range(0.0..1.5);
+        let mood = if score < 1.5 { "⚡ Nhanh" } else { "🧠 Sâu" };
+
+        if let Some(ans) = self.storage.recall_fact(text) { return (score, mood.to_string(), ans); }
+
+        let mut final_answer = String::new();
+
+        if let Ok(res) = self.oracle.smart_search(text).await {
+            if !res.contains("Không tìm thấy") && res.len() > 20 {
+                final_answer = res;
             }
         }
-        1.0 + (active_count / sample as f32)
-    }
 
-    pub async fn stats(&self) -> (usize, f32) {
-        (self.total_neurons, self.total_neurons as f32 * 0.01)
-    }
+        if final_answer.is_empty() {
+            println!("⚠️ Web failed. Calling LLM...");
+            match self.llm.ask_ai(text).await {
+                Ok(ai_res) => {
+                    final_answer = ai_res;
+                },
+                Err(_) => {
+                    final_answer = "Hiện tại Pập Pập chưa tìm thấy thông tin này trên Internet.".to_string();
+                }
+            }
+        }
 
-    // Process Text & Recall Memory from DISK
-    pub async fn process_text(&self, text: &str) -> (f32, String, String) {
-        let mut hasher = DefaultHasher::new();
-        text.hash(&mut hasher);
-        let seed = hasher.finish();
-        let mut rng = StdRng::seed_from_u64(seed);
+        if !final_answer.contains("chưa tìm thấy") {
+            self.storage.learn_fact(text, &final_answer);
+        }
         
-        let intensity = rng.gen_range(0.0..100.0);
-        let score = 1.0 + (intensity / 100.0);
-        let mood = if score < 1.3 { "😴 Calm" } else { "🔥 Excited" };
-
-        // TRUY HỒI TỪ Ổ CỨNG
-        let reply = self.storage.recall_fact(text)
-            .unwrap_or_else(|| "Tôi chưa biết. Dạy tôi bằng lệnh /teach".to_string());
-
-        (score, mood.to_string(), reply)
-    }
-
-    // Lưu kiến thức vào Ổ CỨNG (Vĩnh viễn)
-    pub async fn learn(&self, key: String, value: String) {
-        self.storage.learn_fact(&key, &value);
-        // Có thể thêm logic tăng trọng số nơ-ron ở đây để mô phỏng Long-term Potentiation (LTP)
+        (score, mood.to_string(), final_answer)
     }
 }

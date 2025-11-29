@@ -2,166 +2,309 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PAPPAP AI NEURAL LINK</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PAPPAP AI | NEURAL INTERFACE</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: { 
+                        bg: '#020204', 
+                        panel: 'rgba(10, 20, 30, 0.7)', 
+                        cyan: '#00f3ff', 
+                        pink: '#ff00aa', 
+                        green: '#00ff41' 
+                    },
+                    fontFamily: { 
+                        display: ['"Orbitron"', 'sans-serif'],
+                        mono: ['"Share Tech Mono"', 'monospace'] 
+                    },
+                    boxShadow: {
+                        'neon-cyan': '0 0 5px #00f3ff, 0 0 10px #00f3ff',
+                        'neon-pink': '0 0 5px #ff00aa, 0 0 10px #ff00aa',
+                    },
+                    animation: {
+                        'scanline': 'scanline 8s linear infinite',
+                    },
+                    keyframes: {
+                        scanline: {
+                            '0%': { transform: 'translateY(-100%)' },
+                            '100%': { transform: 'translateY(100%)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
-        :root { --bg: #050505; --panel: #0f1115; --text: #a0a0a0; --neon: #00f2ff; --green: #00ff9d; }
-        body { background: var(--bg); color: var(--text); font-family: 'Courier New', monospace; margin: 0; padding: 20px; overflow-x: hidden; }
-        .container { max-width: 1200px; margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+        body { 
+            background-color: #020204; 
+            color: #e0f2fe; 
+            background-image: 
+                linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
+            overflow-x: hidden;
+        }
         
-        .card { background: var(--panel); border: 1px solid #222; padding: 20px; border-radius: 4px; box-shadow: 0 0 20px rgba(0, 242, 255, 0.05); }
-        h2 { color: var(--neon); margin-top: 0; text-transform: uppercase; font-size: 1em; letter-spacing: 2px; border-bottom: 1px solid #333; padding-bottom: 10px; }
-        
-        /* Chart Container */
-        .chart-box { height: 250px; width: 100%; }
+        /* Hiệu ứng kính */
+        .glass-panel {
+            background: rgba(6, 11, 25, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(0, 243, 255, 0.2);
+            box-shadow: 0 0 15px rgba(0, 243, 255, 0.05);
+        }
 
-        /* Block List */
-        .block-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #222; font-size: 0.85em; }
-        .block-row:first-child { color: var(--green); font-weight: bold; animation: flash 1s; }
-        @keyframes flash { 0% { background: #003300; } 100% { background: transparent; } }
+        /* Nút bấm Neon */
+        .btn-cyber {
+            background: transparent;
+            border: 1px solid #00f3ff;
+            color: #00f3ff;
+            text-shadow: 0 0 5px #00f3ff;
+            transition: all 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-cyber:hover {
+            background: #00f3ff;
+            color: #000;
+            box-shadow: 0 0 20px #00f3ff;
+        }
 
-        /* Chat */
-        #chat-history { height: 300px; overflow-y: auto; background: #000; padding: 10px; border: 1px solid #333; margin-bottom: 10px; }
-        .msg { margin-bottom: 8px; }
-        .msg.user { color: #fff; text-align: right; }
-        .msg.ai { color: var(--neon); }
-        input { width: 70%; padding: 10px; background: #111; border: 1px solid var(--neon); color: white; }
-        button { width: 25%; padding: 10px; background: var(--neon); color: black; border: none; font-weight: bold; cursor: pointer; }
-
-        .stat-value { font-size: 2.5em; color: white; font-weight: bold; }
+        /* Scanline effect */
+        .scanline {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            background: linear-gradient(to bottom, transparent 50%, rgba(0, 243, 255, 0.02) 51%);
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 999;
+        }
     </style>
 </head>
-<body>
-    <div style="text-align: center; margin-bottom: 20px;">
-        <h1 style="color: var(--neon); text-shadow: 0 0 10px var(--neon);">PAPPAP AI NEURAL LINK</h1>
-        <small>GENESIS NODE | <span style="color: var(--green)">? SYSTEM ONLINE</span></small>
-    </div>
+<body class="font-mono min-h-screen flex flex-col relative">
 
-    <div class="container">
-        <div>
-            <div class="card">
-                <h2>?? Neural Activity (Spike Rate)</h2>
-                <div class="chart-box">
+    <div class="scanline"></div>
+
+    <header class="border-b border-cyan/20 bg-bg/90 sticky top-0 z-50 backdrop-blur">
+        <div class="max-w-7xl mx-auto px-4 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="relative w-12 h-12 flex items-center justify-center border-2 border-cyan shadow-neon-cyan">
+                    <span class="text-2xl font-display font-bold text-cyan animate-pulse">P</span>
+                    <div class="absolute -top-1 -right-1 w-2 h-2 bg-pink shadow-neon-pink"></div>
+                    <div class="absolute -bottom-1 -left-1 w-2 h-2 bg-pink shadow-neon-pink"></div>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-display font-bold tracking-widest text-white">PAPPAP <span class="text-cyan">AI</span></h1>
+                    <div class="text-[10px] text-pink tracking-[0.3em] font-bold">GENESIS NODE v0.4</div>
+                </div>
+            </div>
+
+            <div class="glass-panel px-4 py-2 rounded flex items-center gap-3">
+                <div class="text-right hidden sm:block">
+                    <div class="text-[10px] text-gray-400">NETWORK STATUS</div>
+                    <div class="text-green text-xs font-bold tracking-wider">● SYSTEM ONLINE</div>
+                </div>
+                <div class="h-8 w-[1px] bg-gray-700"></div>
+                <div class="text-right">
+                    <div class="text-[10px] text-gray-400">BLOCK HEIGHT</div>
+                    <div class="text-xl text-cyan font-bold" id="header-height">#---</div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="flex-1 max-w-7xl mx-auto w-full p-4 md:p-8 grid grid-cols-1 lg:grid-cols-12 gap-6 relative z-10">
+        
+        <div class="lg:col-span-8 space-y-6">
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="glass-panel p-4 relative group hover:border-cyan/50 transition">
+                    <div class="text-[10px] text-gray-500 mb-1 tracking-widest">ACTIVE NEURONS</div>
+                    <div class="text-2xl font-bold text-cyan drop-shadow-md" id="dash-neurons">---</div>
+                    <div class="absolute bottom-0 left-0 w-full h-[2px] bg-cyan scale-x-0 group-hover:scale-x-100 transition-transform"></div>
+                </div>
+                <div class="glass-panel p-4 relative group hover:border-pink/50 transition">
+                    <div class="text-[10px] text-gray-500 mb-1 tracking-widest">BRAIN POWER</div>
+                    <div class="text-2xl font-bold text-pink drop-shadow-md" id="dash-power">---</div>
+                    <div class="absolute bottom-0 left-0 w-full h-[2px] bg-pink scale-x-0 group-hover:scale-x-100 transition-transform"></div>
+                </div>
+                <div class="glass-panel p-4 relative">
+                    <div class="text-[10px] text-gray-500 mb-1 tracking-widest">PEERS</div>
+                    <div class="text-2xl font-bold text-white">12</div>
+                </div>
+                <div class="glass-panel p-4 relative">
+                    <div class="text-[10px] text-gray-500 mb-1 tracking-widest">CONSENSUS</div>
+                    <div class="text-xl font-bold text-green">PoSNN</div>
+                </div>
+            </div>
+
+            <div class="glass-panel p-5 relative overflow-hidden">
+                <div class="flex justify-between items-center mb-4 border-b border-gray-800 pb-2">
+                    <h3 class="text-cyan font-bold font-display tracking-wide flex items-center gap-2">
+                        <span class="w-2 h-2 bg-cyan"></span> SPIKE ACTIVITY
+                    </h3>
+                    <span class="text-[10px] bg-cyan/10 text-cyan px-2 py-1 border border-cyan/30">REALTIME</span>
+                </div>
+                <div class="h-64 w-full">
                     <canvas id="spikeChart"></canvas>
                 </div>
             </div>
-            
-            <br>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                <div class="card">
-                    <h2>Block Height</h2>
-                    <div class="stat-value" id="height">0</div>
+            <div class="glass-panel p-0 overflow-hidden flex flex-col h-[300px]">
+                <div class="bg-black/40 p-3 border-b border-gray-800 flex justify-between items-center">
+                    <span class="text-xs font-bold text-gray-400">>> MINING LOG (Live Stream)</span>
+                    <div class="flex gap-1">
+                        <div class="w-2 h-2 rounded-full bg-red-500"></div>
+                        <div class="w-2 h-2 rounded-full bg-yellow-500"></div>
+                        <div class="w-2 h-2 rounded-full bg-green-500"></div>
+                    </div>
                 </div>
-                <div class="card">
-                    <h2>Brain Power</h2>
-                    <div class="stat-value" id="power">0</div>
+                <div class="p-4 overflow-y-auto font-mono text-xs space-y-2 flex-1" id="terminal-blocks">
+                    <div class="text-gray-500">Connecting to node...</div>
                 </div>
-            </div>
-
-            <br>
-            
-            <div class="card">
-                <h2>?? Blockchain Stream</h2>
-                <div id="blocks">Loading...</div>
             </div>
         </div>
 
-        <div>
-            <div class="card">
-                <h2>?? Neural Interface</h2>
-                <div id="chat-history">
-                    <div class="msg ai">PAPPAP: H? th?ng da s?n sang. Hay giao ti?p v?i toi.</div>
+        <div class="lg:col-span-4 flex flex-col gap-6">
+            
+            <div class="glass-panel flex-1 flex flex-col relative overflow-hidden h-[600px] lg:h-auto">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-cyan to-pink"></div>
+                
+                <div class="p-4 border-b border-gray-800">
+                    <h2 class="text-xl font-display font-bold text-white">NEURAL LINK</h2>
+                    <p class="text-[10px] text-gray-500">DIRECT CONNECTION TO SNN CORE</p>
                 </div>
-                <div style="display: flex; justify-content: space-between;">
-                    <input type="text" id="prompt" placeholder="Message or /teach question | answer" onkeypress="handleEnter(event)">
-                    <button onclick="send()">SEND</button>
+
+                <div id="chat-history" class="flex-1 overflow-y-auto p-4 space-y-4 text-sm">
+                    <div class="flex flex-col gap-1">
+                        <span class="text-[10px] text-cyan">SYSTEM</span>
+                        <div class="bg-cyan/10 border border-cyan/20 p-3 text-cyan shadow-[0_0_10px_rgba(0,243,255,0.1)]">
+                            PAPPAP NODE INITIALIZED.<br>
+                            Ready to process data.
+                        </div>
+                    </div>
                 </div>
-                <p style="font-size: 0.8em; color: #666; margin-top: 5px;">
-                    Tip: D? d?y AI, dung cu phap: <br><code>/teach Xin chao | Chao b?n!</code>
-                </p>
+
+                <div class="p-4 bg-black/40 border-t border-gray-800">
+                    <div class="flex gap-2 mb-3">
+                        <input type="text" id="chat-input" 
+                            class="flex-1 bg-black border border-gray-700 p-3 text-white focus:border-cyan outline-none text-sm font-mono placeholder-gray-600"
+                            placeholder="Enter command or prompt..."
+                            onkeydown="if(event.key==='Enter') sendPrompt()">
+                        <button onclick="sendPrompt()" class="btn-cyber px-4 font-bold">SEND</button>
+                    </div>
+                    <div class="flex gap-2 flex-wrap">
+                        <span onclick="quickChat('Giá vàng hôm nay')" class="cursor-pointer text-[10px] bg-gray-800 px-2 py-1 hover:text-cyan border border-gray-700">#GoldPrice</span>
+                        <span onclick="quickChat('Bitcoin')" class="cursor-pointer text-[10px] bg-gray-800 px-2 py-1 hover:text-cyan border border-gray-700">#Bitcoin</span>
+                        <span onclick="quickChat('/teach Hello | Hi there')" class="cursor-pointer text-[10px] bg-gray-800 px-2 py-1 hover:text-pink border border-gray-700">#TeachMode</span>
+                    </div>
+                </div>
             </div>
+
         </div>
-    </div>
+    </main>
 
     <script>
-        // --- CHART CONFIG ---
+        // --- 1. CHART SETUP ---
         const ctx = document.getElementById('spikeChart').getContext('2d');
-        const spikeChart = new Chart(ctx, {
+        const chart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: Array(50).fill(''),
+                labels: Array(30).fill(''),
                 datasets: [{
                     label: 'Spike Intensity',
-                    data: Array(50).fill(1),
-                    borderColor: '#00f2ff',
+                    data: Array(30).fill(1),
+                    borderColor: '#00f3ff',
                     borderWidth: 2,
                     tension: 0.4,
                     pointRadius: 0,
-                    fill: true,
-                    backgroundColor: 'rgba(0, 242, 255, 0.1)'
+                    pointHoverRadius: 4,
+                    backgroundColor: (ctx) => {
+                        const grad = ctx.chart.ctx.createLinearGradient(0,0,0,300);
+                        grad.addColorStop(0, 'rgba(0, 243, 255, 0.2)');
+                        grad.addColorStop(1, 'rgba(0, 243, 255, 0)');
+                        return grad;
+                    },
+                    fill: true
                 }]
             },
             options: {
+                responsive: true,
+                maintainAspectRatio: false,
                 animation: false,
-                scales: { 
-                    y: { display: false, min: 0.9, max: 2.5 },
-                    x: { display: false }
-                },
-                plugins: { legend: { display: false } }
+                interaction: { intersect: false, mode: 'index' },
+                plugins: { legend: { display: false } },
+                scales: {
+                    x: { display: false },
+                    y: { 
+                        display: true, 
+                        grid: { color: 'rgba(255,255,255,0.05)' },
+                        ticks: { color: '#666', font: { family: 'Share Tech Mono' } }
+                    }
+                }
             }
         });
 
-        // --- CORE LOGIC ---
+        // --- 2. DATA FETCHING ---
         const API = '/api';
-
-        async function loop() {
+        
+        async function updateData() {
             try {
-                // 1. Get Stats & Blocks
-                const [healthRes, blocksRes] = await Promise.all([
-                    fetch(`${API}/health`),
-                    fetch(`${API}/blocks`)
-                ]);
-                const health = await healthRes.json();
-                const blocks = await blocksRes.json();
+                // Health
+                const hRes = await fetch(`${API}/health`);
+                const hData = await hRes.json();
+                document.getElementById('header-height').innerText = '#' + hData.height;
+                document.getElementById('dash-neurons').innerText = hData.neurons.toLocaleString();
+                document.getElementById('dash-power').innerText = hData.power.toFixed(2);
 
-                // Update DOM
-                document.getElementById('height').innerText = health.height;
-                document.getElementById('power').innerText = health.power.toFixed(1);
+                // Blocks
+                const bRes = await fetch(`${API}/blocks`);
+                const bData = await bRes.json();
+                
+                // Update Terminal Log
+                const term = document.getElementById('terminal-blocks');
+                term.innerHTML = bData.slice(0, 15).map(b => {
+                    const time = new Date(b.timestamp * 1000).toLocaleTimeString();
+                    const spikeColor = b.spike_score > 1.5 ? 'text-pink' : 'text-green';
+                    return `
+                        <div class="flex gap-2 hover:bg-white/5 p-1 transition-colors">
+                            <span class="text-gray-600">[${time}]</span>
+                            <span class="text-cyan">BLOCK #${b.index}</span>
+                            <span class="text-gray-500 hidden sm:inline">|</span>
+                            <span class="text-gray-400 font-mono text-[10px] truncate w-24 sm:w-auto">${b.hash.substring(0,12)}...</span>
+                            <span class="${spikeColor} ml-auto">⚡${b.spike_score.toFixed(4)}</span>
+                        </div>
+                    `
+                }).join('');
 
-                // Update Chart (Simulate Heartbeat)
-                // L?y spike t? block m?i nh?t d? v?
-                const latestSpike = blocks[0]?.spike_score || 1.0;
-                const data = spikeChart.data.datasets[0].data;
-                data.shift();
-                data.push(latestSpike);
-                spikeChart.update();
+                // Update Chart
+                if(bData.length > 0) {
+                    const latest = bData[0].spike_score;
+                    const d = chart.data.datasets[0].data;
+                    d.shift();
+                    d.push(latest);
+                    chart.update();
+                }
 
-                // Update Blocks List
-                const html = blocks.map(b => `
-                    <div class="block-row">
-                        <span>#${b.index} <span style="color:#666">${b.hash.substring(0,8)}...</span></span>
-                        <span style="color: ${b.spike_score > 1.5 ? '#ff0055' : '#00ff9d'}">
-                            ? ${b.spike_score.toFixed(4)}
-                        </span>
-                    </div>
-                `).join('');
-                document.getElementById('blocks').innerHTML = html;
-
-            } catch(e) {}
-            setTimeout(loop, 800); // 800ms refresh rate
+            } catch(e) { console.error("API Error", e); }
         }
 
-        // --- CHAT LOGIC ---
-        async function send() {
-            const input = document.getElementById('prompt');
+        // --- 3. CHAT LOGIC ---
+        async function sendPrompt() {
+            const input = document.getElementById('chat-input');
             const val = input.value.trim();
             if(!val) return;
 
             addMsg('user', val);
             input.value = '';
 
-            // Check if teaching command
+            // Teach Logic
             if (val.startsWith('/teach ')) {
                 const parts = val.replace('/teach ', '').split('|');
                 if (parts.length === 2) {
@@ -170,39 +313,69 @@
                         headers: {'Content-Type': 'application/json'},
                         body: JSON.stringify({ keyword: parts[0].trim(), answer: parts[1].trim() })
                     });
-                    addMsg('ai', `? Da h?c: "${parts[0].trim()}"`);
+                    addMsg('ai', `ACCESS GRANTED: Knowledge stored in Cortex.`);
                     return;
                 }
             }
 
-            // Normal chat
-            const res = await fetch(`${API}/prompt`, {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ prompt: val })
-            });
-            const data = await res.json();
-            
-            let moodIcon = '??';
-            if (data.mood.includes('Excited')) moodIcon = '??';
-            if (data.mood.includes('Calm')) moodIcon = '??';
-            
-            addMsg('ai', `${moodIcon} [${data.mood}] ${data.ai_response}`);
+            // Normal Chat
+            try {
+                const res = await fetch(`${API}/prompt`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({ prompt: val })
+                });
+                const data = await res.json();
+                
+                let moodColor = 'text-green';
+                if(data.mood.includes('Excited')) moodColor = 'text-pink';
+                if(data.mood.includes('Thinking')) moodColor = 'text-yellow-400';
+
+                const html = `
+                    <div class="text-[10px] mb-1 flex items-center gap-2">
+                        <span class="${moodColor}">STATUS: ${data.mood.toUpperCase()}</span>
+                        <span class="text-gray-600">|</span>
+                        <span class="text-cyan">SPIKE: ${data.spike.toFixed(4)}</span>
+                    </div>
+                    ${data.ai_response}
+                `;
+                addMsg('ai', html);
+
+            } catch(e) {
+                addMsg('ai', '❌ ERROR: Neural Link Severed.');
+            }
         }
 
-        function addMsg(role, text) {
+        function addMsg(role, content) {
             const box = document.getElementById('chat-history');
             const div = document.createElement('div');
-            div.className = `msg ${role}`;
-            div.innerText = (role === 'ai' ? 'AI: ' : 'YOU: ') + text;
+            div.className = `flex flex-col gap-1 ${role === 'user' ? 'items-end' : 'items-start'} animate-fade-in`;
+            
+            const label = role === 'user' ? 'OPERATOR' : 'PAPPAP CORE';
+            const labelColor = role === 'user' ? 'text-gray-500' : 'text-cyan';
+            
+            div.innerHTML = `
+                <span class="text-[10px] ${labelColor} tracking-wider">${label}</span>
+                <div class="max-w-[90%] p-3 rounded text-sm ${
+                    role === 'user' 
+                    ? 'bg-gray-800 text-white border border-gray-600' 
+                    : 'bg-cyan/5 text-cyan border border-cyan/20 shadow-[0_0_10px_rgba(0,243,255,0.05)]'
+                }">
+                    ${typeof content === 'string' ? content : content}
+                </div>
+            `;
             box.appendChild(div);
             box.scrollTop = box.scrollHeight;
         }
 
-        function handleEnter(e) { if(e.key === 'Enter') send(); }
+        function quickChat(text) {
+            document.getElementById('chat-input').value = text;
+            sendPrompt();
+        }
 
-        // Start
-        loop();
+        // Init
+        setInterval(updateData, 1000);
+        updateData();
     </script>
 </body>
 </html>
