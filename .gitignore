@@ -1,21 +1,11 @@
-# Pappap AI Chain – không d?y lên GitHub
+# B? qua thu m?c Database (Quan tr?ng)
 pappap_data/
+pappap-data/
+
+# B? qua thu m?c Build (N?ng, không c?n thi?t)
 target/
-*.log
-*.tmp
-*.lock
-__sled__lock
-/db
-/blobs
-/config
-/tmp
+**/*.rs.bk
 
-# Rust common
-Cargo.lock
-/.cargo
-/.rustup
-
-# IDE & h? th?ng
-.idea/
-.vscode/
+# B? qua file h? th?ng/môi tru?ng
 .DS_Store
+.env
